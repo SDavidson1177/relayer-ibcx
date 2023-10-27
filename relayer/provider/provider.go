@@ -227,6 +227,7 @@ func (r RelayerTxResponse) MarshalLogObject(enc zapcore.ObjectEncoder) error {
 type KeyProvider interface {
 	CreateKeystore(path string) error
 	KeystoreCreated(path string) bool
+	UseKey(key string) error
 	AddKey(name string, coinType uint32, signingAlgorithm string) (output *KeyOutput, err error)
 	RestoreKey(name, mnemonic string, coinType uint32, signingAlgorithm string) (address string, err error)
 	ShowAddress(name string) (address string, err error)
@@ -421,8 +422,7 @@ type ChainProvider interface {
 		asyncCallback func(*RelayerTxResponse, error),
 	) error
 
-	MsgRegisterCounterpartyPayee(portID, channelID, relayerAddr, counterpartyPayeeAddr string) (RelayerMessage,error)
-	
+	MsgRegisterCounterpartyPayee(portID, channelID, relayerAddr, counterpartyPayeeAddr string) (RelayerMessage, error)
 
 	ChainName() string
 	ChainId() string

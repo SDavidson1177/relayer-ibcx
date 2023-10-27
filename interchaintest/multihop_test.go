@@ -420,6 +420,7 @@ func TestRelayerMultihop(t *testing.T) {
 	const pathWasm1Wasm2 = "wasm1-wasm2"
 	const relayerName = "relayer"
 
+	// Add 3 chains, 1 relayer and 3 links
 	ic := interchaintest.NewInterchain().
 		AddChain(wasm1).
 		AddChain(osmosis).

@@ -46,12 +46,29 @@ func keysCmd(a *appState) *cobra.Command {
 	cmd.AddCommand(
 		keysAddCmd(a),
 		keysRestoreCmd(a),
+		keysUseCmd(a),
 		keysDeleteCmd(a),
 		keysListCmd(a),
 		keysExportCmd(a),
 		keysShowCmd(a),
 	)
 
+	return cmd
+}
+
+func keysUseCmd(a *appState) *cobra.Command {
+
+	cmd := &cobra.Command{
+		Use:     "use chain_name key_name",
+		Aliases: []string{"u"},
+		Short:   "Use a key from the keychain associated with a particular chain. Run 'rly keys list ibc-0' to view available keys",
+		Args:    withUsage(cobra.ExactArgs(2)),
+		Example: strings.TrimSpace(fmt.Sprintf(`
+$ %s keys use ibc-0 key_name`, appName)),
+		RunE: func(cmd *cobra.Command, args []string) error {
+			return a.useKey(args[0], args[1])
+		},
+	}
 	return cmd
 }
 

@@ -587,24 +587,35 @@ $ %s tx connect demo-path --src-port transfer --dst-port transfer --order unorde
 				return err
 			}
 
+			fmt.Printf("Path: %v\n", pth)
+
 			src, dst := pth.Src.ChainID, pth.Dst.ChainID
 			chainIDs := []string{src}
 			for _, hop := range pth.Hops {
 				chainIDs = append(chainIDs, hop.ChainID)
 			}
+
+			fmt.Printf("Src, Dst: %v, %v\n", src, dst)
 			chainIDs = append(chainIDs, dst)
 			c, err := a.config.Chains.Gets(chainIDs...)
 			if err != nil {
 				return err
 			}
 
+			fmt.Printf("Chain IDs: %v\n", chainIDs)
+			fmt.Printf("Got c: %v\n", c)
+
 			c[src].PathEnd = pth.Src
 			hops := []*relayer.Chain{}
+			fmt.Printf("Src chain %v\n", c[src])
 			for _, hop := range pth.Hops {
 				hopChain := c[hop.ChainID]
 				c[hop.ChainID].RelayPathEnds = hop.PathEnds
+				c[hop.ChainID].PathEnd = hop.PathEnds[0]
 				hops = append(hops, hopChain)
+				fmt.Printf("Intermediate chain %v: for %v\n", c[hop.ChainID], hop.ChainID)
 			}
+			fmt.Printf("Dst chain %v\n", c[dst])
 			c[dst].PathEnd = pth.Dst
 
 			srcPort, err := cmd.Flags().GetString(flagSrcPort)
@@ -663,6 +674,8 @@ $ %s tx connect demo-path --src-port transfer --dst-port transfer --order unorde
 					break
 				}
 				dstChainID := chainIDs[i+1]
+
+				fmt.Printf("dstChainID: %v\n", dstChainID)
 
 				// create clients if they aren't already created
 				clientSrc, clientDst, err := c[srcChainID].CreateClients(cmd.Context(), c[dstChainID], allowUpdateAfterExpiry, allowUpdateAfterMisbehaviour, override, customClientTrustingPeriod, memo)

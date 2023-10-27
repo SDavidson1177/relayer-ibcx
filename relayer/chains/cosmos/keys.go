@@ -63,6 +63,13 @@ func (cc *CosmosProvider) KeystoreCreated(path string) bool {
 	return true
 }
 
+// Updates config.yaml chain with the specified key.
+// It fails config is already using the same key or if the key does not exist
+func (cc *CosmosProvider) UseKey(key string) error {
+	cc.PCfg.Key = key
+	return nil
+}
+
 // AddKey generates a new mnemonic which is then converted to a private key and BIP-39 HD Path and persists it to the keystore.
 // It fails if there is an existing key with the same address.
 func (cc *CosmosProvider) AddKey(name string, coinType uint32, signingAlgorithm string) (output *provider.KeyOutput, err error) {

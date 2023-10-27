@@ -35,6 +35,37 @@ func (a *appState) configPath() string {
 	return path.Join(a.homePath, "config", "config.yaml")
 }
 
+func (a *appState) useKey(chainName, key string) error {
+
+	chain, exists := a.config.Chains[chainName]
+	if !exists {
+		return fmt.Errorf("chain %s not found in config", chainName)
+	}
+
+	cc := chain.ChainProvider
+
+	info, err := cc.ListAddresses()
+	if err != nil {
+		return err
+	}
+	value, exists := info[key]
+	currentValue := a.config.Chains[chainName].ChainProvider.Key()
+
+	if currentValue == key {
+		return fmt.Errorf("config is already using %s -> %s for %s", key, value, cc.ChainName())
+	}
+
+	if exists {
+		fmt.Printf("Config will now use  %s -> %s  for %s\n", key, value, cc.ChainName())
+	} else {
+		return fmt.Errorf("key %s does not exist for chain %s", key, cc.ChainName())
+	}
+	return a.performConfigLockingOperation(context.Background(), func() error {
+		a.config.Chains[chainName].ChainProvider.UseKey(key)
+		return nil
+	})
+}
+
 // loadConfigFile reads config file into a.Config if file is present.
 func (a *appState) loadConfigFile(ctx context.Context) error {
 	cfgPath := a.configPath()
